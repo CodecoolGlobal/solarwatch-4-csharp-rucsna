@@ -23,4 +23,26 @@ public class SolarWatchController : ControllerBase
         _cityJsonProcessor = cityJsonProcessor;
         _solarJsonProcessor = solarJsonProcessor;
     }
+    
+    [HttpGet("GetSunrise_Sunset")]
+    public async Task<ActionResult<SolarData>> GetAsync(string cityName, DateTime date)
+    {
+        try
+        {
+            var cityData = await _cityDataProvider.GetCityDataAsync(cityName);
+            
+            var lat = _cityJsonProcessor.Process(cityData).Latitude;
+            var lon = _cityJsonProcessor.Process(cityData).Longitude;
+
+            var solarData = await _solarDataProvider.GetSolarDataAsync(lat, lon, date);
+
+            return Ok(_solarJsonProcessor.Process(solarData, cityName, date));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting solar data");
+            return NotFound("Error getting solar data");
+        }
+        
+    }
 }
