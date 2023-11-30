@@ -1,4 +1,5 @@
 using SolarWatch.Client;
+using SolarWatch.Processors;
 using SolarWatch.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ISolarWatchClient, SolarWatchClient>();
 builder.Services.AddScoped<ICityDataProvider, GeocodingApi>();
+builder.Services.AddScoped<ISolarDataProvider, SunriseSunsetApi>();
+builder.Services.AddScoped<ICityJsonProcessor, CityJsonProcessor>();
+builder.Services.AddScoped<ISolarJsonProcessor, SolarJsonProcessor>();
 
 var app = builder.Build();
 
