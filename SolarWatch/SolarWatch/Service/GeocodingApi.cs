@@ -14,8 +14,16 @@ public class GeocodingApi : ICityDataProvider
         _logger = logger;
     }
     
-    public Task<string> GetCityDataAsync(string cityName)
+    public async Task<string> GetCityDataAsync(string cityName)
     {
-        throw new NotImplementedException();
+        var apiKey = "";
+
+        var url = $"http://api.openweathermap.org/geo/1.0/direct?q={cityName}&appid={apiKey}";
+        
+        var client = _solarWatchClient.GetClient();
+        _logger.LogInformation("Calling OpenWeather API with url: {url}", url);
+
+        var response = await client.GetAsync(url);
+        return await response.Content.ReadAsStringAsync();
     }
 }
