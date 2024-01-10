@@ -1,17 +1,14 @@
-﻿using System.Net;
-using SolarWatch.Client;
-
-namespace SolarWatch.Service;
+﻿namespace SolarWatch.Service;
 
 public class SunriseSunsetApi : ISolarDataProvider
 {
-    private readonly ISolarWatchClient _solarWatchClient;
+    private readonly IHttpClientFactory _clientFactory;
     private readonly ILogger<SunriseSunsetApi> _logger;
 
-    public SunriseSunsetApi(ISolarWatchClient solarWatchClient, ILogger<SunriseSunsetApi> logger)
+    public SunriseSunsetApi(ILogger<SunriseSunsetApi> logger, IHttpClientFactory clientFactory)
     {
-        _solarWatchClient = solarWatchClient;
         _logger = logger;
+        _clientFactory = clientFactory;
     }
 
     public async Task<string> GetSolarDataAsync(float lat, float lon, DateTime date)
@@ -22,7 +19,7 @@ public class SunriseSunsetApi : ISolarDataProvider
        
         _logger.LogInformation("Calling Sunrise/Sunset API from url: {url}", url);
 
-        var client = _solarWatchClient.GetClient();
+        var client = _clientFactory.CreateClient();
         var response = await client.GetAsync(url);
         return await response.Content.ReadAsStringAsync();
     }
