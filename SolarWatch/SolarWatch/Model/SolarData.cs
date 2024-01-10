@@ -2,8 +2,13 @@
 
 public class SolarData
 {
-    public string? City { get; set; }
+    public Guid SolarDataId { get; set; }
+    public Guid CityId { get; set; }
     public DateTime Date { get; set; }
-    public string? Sunrise { get; set; }
-    public string? Sunset { get; set; }
+    public string Sunrise { get; set; }
+    public string Sunset { get; set; }
+
+    public SolarData()
+    {
+    }
 }
