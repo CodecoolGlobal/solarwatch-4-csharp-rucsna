@@ -24,5 +24,11 @@ public class CityService : ICityService
         return cityList.Count < 1 ? null : cityList;
     }
 
-    
+    public async Task<IEnumerable<City>?> GetAllCitiesAsync()
+    {
+        var allCities = await _dbContext.Cities
+            .Include(c => c.Coordinate)
+            .ToListAsync();
+        return allCities.Count < 1 ? null : allCities;
+    }
 }
