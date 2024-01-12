@@ -41,5 +41,24 @@ public class CityController : ControllerBase
         }
     }
 
-    
+    [Authorize(Roles = "Admin")]
+    [HttpGet("All")]
+    public async Task<ActionResult<IEnumerable<City>>> GetAllAsync()
+    {
+        try
+        {
+            var result = await _service.GetAllCitiesAsync();
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return NotFound("No cities were found");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting cities");
+            return BadRequest("Error getting cities");
+        }
+    }
 }
