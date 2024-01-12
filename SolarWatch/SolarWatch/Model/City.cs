@@ -6,7 +6,7 @@ public class City
     public string Name { get; set; }
     public Coordinate Coordinate { get; set; }
     public string? State { get; set; }
-    public string? Country { get; set; }
+    public string Country { get; set; }
 
     public City()
     {
