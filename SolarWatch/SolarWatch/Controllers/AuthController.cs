@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SolarWatch.Contracts;
 using SolarWatch.Service.Authentication;
-using Microsoft.Extensions.Configuration;
 
 namespace SolarWatch.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("/api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -26,7 +25,7 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var userRole = _configuration["RoleSettings:UserRole"];
+        var userRole = _configuration["RoleSettings:UserRole"]!;
         var result = await _authService.RegisterAsync(request.Email, request.UserName, request.Password, userRole);
         if (!result.Success)
         {
