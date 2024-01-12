@@ -52,6 +52,7 @@ void AddServices()
     builder.Services.AddScoped<ICityJsonProcessor, CityJsonProcessor>();
     builder.Services.AddScoped<ISolarJsonProcessor, SolarJsonProcessor>();
     builder.Services.AddScoped<ISolarWatchRepository, SolarWatchRepository>();
+    builder.Services.AddScoped<ICityService, CityService>();
 }
 
 void ConfigureSwagger()
@@ -150,7 +151,7 @@ void AddRoles()
 
 async Task CreateAdminRole(RoleManager<IdentityRole> roleManager)
 {
-    await roleManager.CreateAsync(new IdentityRole(builder.Configuration["RoleSettingsAdminRole"]!));
+    await roleManager.CreateAsync(new IdentityRole(builder.Configuration["RoleSettings:AdminRole"]!));
 }
 
 async Task CreateUserRole(RoleManager<IdentityRole> roleManager)
@@ -174,9 +175,10 @@ async Task CreateAdminIfNotExists()
         var admin = new IdentityUser { UserName = "admin", Email = "admin@admin.com"};
         var adminCreated = await userManager.CreateAsync(admin, "admin123");
 
+        var adminRole = builder.Configuration["RoleSettings:AdminRole"]!;
         if (adminCreated.Succeeded)
         {
-            await userManager.AddToRoleAsync(admin, "Admin");
+            await userManager.AddToRoleAsync(admin, adminRole);
         }
     }
 }
