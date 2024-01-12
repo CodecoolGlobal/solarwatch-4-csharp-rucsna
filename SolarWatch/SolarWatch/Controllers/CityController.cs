@@ -61,4 +61,25 @@ public class CityController : ControllerBase
             return BadRequest("Error getting cities");
         }
     }
+    
+    
+    [HttpPost("NewCity")]
+    public async Task<ActionResult<City>> AddCityAsync([Required] City newCity)
+    {
+        try
+        {
+            var result = await _service.CreateCityAsync(newCity.CityId, newCity.Name, newCity.Coordinate,
+                newCity.Country, newCity.State == null ? newCity.State : string.Empty);
+            if (result == null)
+            {
+                return Conflict($"City {newCity.Name} already exists in database");
+            }
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error adding new city to database");
+            return BadRequest("Error adding new city to database");
+        }
+    }
 }
