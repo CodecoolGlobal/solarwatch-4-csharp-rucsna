@@ -1,14 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolarWatch.Model;
-using SolarWatch.Service.Processors;
-using SolarWatch.Service;
 using SolarWatch.Service.Repository;
 
 namespace SolarWatch.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("/api/[controller]")]
 public class SolarWatchController : ControllerBase
 {
     private readonly ILogger<SolarWatchController> _logger;
@@ -20,7 +18,8 @@ public class SolarWatchController : ControllerBase
         _repository = repository;
     }
     
-    [HttpGet("GetSunrise_Sunset")/*, Authorize(Roles="User, Admin")*/]
+    [Authorize(Roles = "Admin, User")]
+    [HttpGet("GetSunrise_Sunset")]
     public async Task<ActionResult<SolarData>> GetAsync(string cityName, DateTime date)
     {
         try
