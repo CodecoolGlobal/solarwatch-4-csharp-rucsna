@@ -31,4 +31,20 @@ public class CityService : ICityService
             .ToListAsync();
         return allCities.Count < 1 ? null : allCities;
     }
+    
+    public async Task<City?> CreateCityAsync(Guid id, string name, Coordinate coordinate, string country, string? state)
+    {
+        var cityInDb =
+            await _dbContext.Cities.FirstOrDefaultAsync(city => city.Name == name && city.Coordinate == coordinate);
+        if (cityInDb != null)
+        {
+            return null;
+        }
+        var newCity = new City { CityId = id, Name = name, Coordinate = coordinate, Country = country, State = state };
+        // when adding a new city, coordinates could be get from Geocoding API automatically
+
+        await _dbContext.Cities.AddAsync(newCity);
+        await _dbContext.SaveChangesAsync();
+        return newCity;
+    }
 }
