@@ -4,12 +4,12 @@ using SolarWatch.Model;
 
 namespace SolarWatch.Service.Repository;
 
-public class CityService : ICityService
+public class CityRepository : ICityRepository
 {
     private readonly SolarDbContext _dbContext;
-    private readonly ILogger<CityService> _logger;
+    private readonly ILogger<CityRepository> _logger;
 
-    public CityService(SolarDbContext dbContext, ILogger<CityService> logger)
+    public CityRepository(SolarDbContext dbContext, ILogger<CityRepository> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
@@ -32,19 +32,32 @@ public class CityService : ICityService
         return allCities.Count < 1 ? null : allCities;
     }
     
-    public async Task<City?> CreateCityAsync(Guid id, string name, Coordinate coordinate, string country, string? state)
+    public async Task<City?> CreateCityAsync(City newCity)
     {
         var cityInDb =
-            await _dbContext.Cities.FirstOrDefaultAsync(city => city.Name == name && city.Coordinate == coordinate);
+            await _dbContext.Cities.FirstOrDefaultAsync(city => city.Name == newCity.Name && city.Coordinate == newCity.Coordinate);
         if (cityInDb != null)
         {
             return null;
         }
-        var newCity = new City { CityId = id, Name = name, Coordinate = coordinate, Country = country, State = state };
+        
         // when adding a new city, coordinates could be get from Geocoding API automatically
-
         await _dbContext.Cities.AddAsync(newCity);
         await _dbContext.SaveChangesAsync();
         return newCity;
+    }
+
+    public async Task UpdateCityAsync(Guid cityId, City updateRequest)
+    {
+        var cityInDb = await _dbContext.Cities.FindAsync(cityId);
+        if (cityInDb == null)
+        {
+            _logger.LogError("No city was found in the database with id: {cityId}", cityId);
+            throw new Exception($"No city was found in the database with id: {cityId}");
+        }
+
+        cityInDb.Update(updateRequest);
+        _dbContext.Update(cityInDb);
+        await _dbContext.SaveChangesAsync();
     }
 }
