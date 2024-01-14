@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SolarWatch.Controllers;
 using SolarWatch.Model;
-using SolarWatch.Processors;
+using SolarWatch.Service.Processors;
 using SolarWatch.Service;
+using SolarWatch.Service.Repository;
+
 
 namespace SolarWatchTest;
 
@@ -15,20 +17,17 @@ public class SolarWatchControllerTest
     private Mock<ILogger<SolarWatchController>>? _loggerMock;
     private Mock<ICityDataProvider>? _cityDataProviderMock;
     private Mock<ICityJsonProcessor>? _cityJsonProcessorMock;
-    private Mock<ISolarDataProvider>? _solarDataProviderMock;
-    private Mock<ISolarJsonProcessor>? _solarJsonProcessorMock;
+    private Mock<ISolarWatchRepository> _repositoryMock;
     private SolarWatchController _controller;
-    
+
     [SetUp]
     public void Setup()
     {
         _loggerMock = new Mock<ILogger<SolarWatchController>>();
         _cityDataProviderMock = new Mock<ICityDataProvider>();
         _cityJsonProcessorMock = new Mock<ICityJsonProcessor>();
-        _solarDataProviderMock = new Mock<ISolarDataProvider>();
-        _solarJsonProcessorMock = new Mock<ISolarJsonProcessor>();
-        _controller = new SolarWatchController(_loggerMock.Object, _cityDataProviderMock.Object,
-            _solarDataProviderMock.Object, _cityJsonProcessorMock.Object, _solarJsonProcessorMock.Object);
+        _repositoryMock = new Mock<ISolarWatchRepository>();
+        _controller = new SolarWatchController(_loggerMock.Object, _repositoryMock.Object);
     }
 
     [Test]
@@ -63,11 +62,13 @@ public class SolarWatchControllerTest
     // public async Task Test_GetReturnsOkResult_IfCityDataIsValid()
     // {
     //     // Arrange
-    //     var expectedSolarData = new SolarData();
-    //     var solarData = "{}";
     //     var date = new DateTime(2023,11,11);
-    //     _solarDataProviderMock?.Setup(x => x.GetSolarDataAsync(It.IsAny<float>(), It.IsAny<float>(), date)).ReturnsAsync(solarData);
-    //     _solarJsonProcessorMock?.Setup(x => x.Process(solarData, "Paris", date)).Returns(expectedSolarData);
+    //     var expectedSolarData = new SolarData{Date = date};
+    //     //var solarData = "{}";
+    //     // _solarDataProviderMock?.Setup(x => x.GetSolarDataAsync(It.IsAny<float>(), It.IsAny<float>(), date)).ReturnsAsync(solarData);
+    //     // _solarJsonProcessorMock?.Setup(x => x.Process(solarData, "Paris", date)).Returns(expectedSolarData);
+    //
+    //     _repositoryMock.Setup(x => x.GetDataAndAddToDbAsync(It.IsAny<string>(), date)).ReturnsAsync(expectedSolarData);
     //
     //     // Act
     //     var result = await _controller.GetAsync("Paris", date);
