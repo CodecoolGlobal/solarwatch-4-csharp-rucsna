@@ -11,4 +11,12 @@ public class City
     public City()
     {
     }
+
+    public void Update(City updateRequest)
+    {
+        Name = updateRequest.Name;
+        Coordinate = updateRequest.Coordinate;
+        State = updateRequest.State;
+        Country = updateRequest.Country;
+    }
 }
