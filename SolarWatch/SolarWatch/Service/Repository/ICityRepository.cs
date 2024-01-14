@@ -2,9 +2,10 @@
 
 namespace SolarWatch.Service.Repository;
 
-public interface ICityService
+public interface ICityRepository
 {
     Task<IEnumerable<City>?> GetCityByNameAsync(string cityName);
     Task<IEnumerable<City>?> GetAllCitiesAsync();
-    Task<City?> CreateCityAsync(Guid id, string name, Coordinate coordinate, string country, string? state);
+    Task<City?> CreateCityAsync(City newCity);
+    Task UpdateCityAsync(Guid cityId, City updateRequest);
 }
