@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SolarWatch.Data;
+using SolarWatch.Migrations.Users;
 using SolarWatch.Model;
 using SolarWatch.Service.Repository;
 
@@ -12,12 +12,14 @@ namespace SolarWatch.Controllers;
 public class CityController : ControllerBase
 {
     private readonly ILogger<SolarWatchController> _logger;
-    private readonly ICityService _service;
+    private readonly ICityRepository _repository;
+    private readonly IConfiguration _configuration;
 
-    public CityController(ILogger<SolarWatchController> logger, ICityService service)
+    public CityController(ILogger<SolarWatchController> logger, ICityRepository service, IConfiguration configuration)
     {
         _logger = logger;
-        _service = service;
+        _repository = service;
+        _configuration = configuration;
     }
 
     [Authorize(Roles = "Admin")]
@@ -26,7 +28,7 @@ public class CityController : ControllerBase
     {
         try
         {
-            var result = await _service.GetCityByNameAsync(cityName);
+            var result = await _repository.GetCityByNameAsync(cityName);
             if (result != null)
             {
                 return Ok(result);
@@ -47,7 +49,7 @@ public class CityController : ControllerBase
     {
         try
         {
-            var result = await _service.GetAllCitiesAsync();
+            var result = await _repository.GetAllCitiesAsync();
             if (result != null)
             {
                 return Ok(result);
@@ -62,14 +64,13 @@ public class CityController : ControllerBase
         }
     }
     
-    
+    [Authorize(Roles = "Admin")]
     [HttpPost("NewCity")]
     public async Task<ActionResult<City>> AddCityAsync([Required] City newCity)
     {
         try
         {
-            var result = await _service.CreateCityAsync(newCity.CityId, newCity.Name, newCity.Coordinate,
-                newCity.Country, newCity.State == null ? newCity.State : string.Empty);
+            var result = await _repository.CreateCityAsync(newCity);
             if (result == null)
             {
                 return Conflict($"City {newCity.Name} already exists in database");
@@ -80,6 +81,22 @@ public class CityController : ControllerBase
         {
             _logger.LogError(e, "Error adding new city to database");
             return BadRequest("Error adding new city to database");
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{cityId:guid}")]
+    public async Task<IActionResult> UpdateCity([Required] Guid cityId, [FromBody] City updateRequest)
+    {
+        try
+        {
+            await _repository.UpdateCityAsync(cityId, updateRequest);
+            return Ok($"The city on id: {cityId} successfully updated to {updateRequest}");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error updating city");
+            return BadRequest("Error updating city");
         }
     }
 }
